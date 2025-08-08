@@ -25,7 +25,7 @@ const AdminPanel = () => {
   const navigate = useNavigate();
   
   // The backend URL has been updated to point to a local server for consistency.
-  const backendUrl = 'http://localhost:5000';
+  const backendUrl = 'https://hsc-mcq-backend.onrender.com';
 
   // Component mount হওয়ার সময় টোকেন আছে কিনা চেক করা হচ্ছে।
   useEffect(() => {

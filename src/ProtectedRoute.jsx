@@ -9,7 +9,7 @@ const ProtectedRoute = ({ children }) => {
 
   // The backend URL is now hardcoded to resolve the 'process is not defined' error.
   // For a permanent solution, ensure your front-end build system correctly handles environment variables.
-  const backendUrl = 'http://localhost:5000';
+  const backendUrl = 'https://hsc-mcq-backend.onrender.com';
 
   useEffect(() => {
     const verifyToken = async () => {

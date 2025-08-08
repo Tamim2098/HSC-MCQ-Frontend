@@ -25,7 +25,7 @@ const MCQ = () => {
   const [error, setError] = useState(null);
 
   // The backend URL has been updated to point to a local server for consistency.
-  const backendUrl = 'http://localhost:5000';
+  const backendUrl = 'https://hsc-mcq-backend.onrender.com';
 
   // This useEffect runs once when the component mounts to fetch questions.
   // It checks for query parameters and then calls `fetchNewQuestions`.

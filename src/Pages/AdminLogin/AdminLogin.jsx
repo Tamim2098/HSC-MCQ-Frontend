@@ -11,7 +11,7 @@ const AdminLogin = () => {
 
   // লোকাল সার্ভারে চালানোর জন্য URL আপডেট করা হয়েছে
   // নিশ্চিত করুন আপনার ব্যাকএন্ড সার্ভারটি এই পোর্টে চলছে
-  const backendUrl = 'http://localhost:5000';
+  const backendUrl = 'https://hsc-mcq-backend.onrender.com';
 
   const handleSubmit = async (e) => {
     e.preventDefault();

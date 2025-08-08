@@ -1,0 +1,138 @@
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { motion } from 'framer-motion';
+
+const AdminLogin = () => {
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const navigate = useNavigate();
+
+  // লোকাল সার্ভারে চালানোর জন্য URL আপডেট করা হয়েছে
+  // নিশ্চিত করুন আপনার ব্যাকএন্ড সার্ভারটি এই পোর্টে চলছে
+  const backendUrl = 'http://localhost:5000';
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    setError(null);
+
+    if (!username || !password) {
+      setError("Please enter both username and password.");
+      setLoading(false);
+      return;
+    }
+    
+    console.log("Sending credentials to:", `${backendUrl}/api/admin/login`);
+    console.log("With data:", { username, password });
+
+    try {
+      const response = await fetch(`${backendUrl}/api/admin/login`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ username, password }),
+      });
+
+      if (!response.ok) {
+        console.error('Server responded with an error status:', response.status);
+        try {
+          const errorData = await response.json();
+          setError(errorData.message || 'An error occurred. Please try again.');
+        } catch (jsonError) {
+          setError('Failed to connect to the login server. Please check the API endpoint.');
+        }
+        setLoading(false);
+        return;
+      }
+
+      const data = await response.json();
+      console.log('Login successful:', data);
+
+      // Store the token in localStorage
+      if (data.token) {
+        localStorage.setItem('adminToken', data.token);
+
+        // A temporary fix: Adding a small delay to prevent a race condition
+        // The router's state might update before localStorage is fully available.
+        setTimeout(() => {
+            navigate('/admin', { replace: true });
+        }, 100);
+
+      } else {
+        setError('Login successful, but no token received.');
+      }
+
+    } catch (err) {
+      console.error('Error during login:', err);
+      setError('An error occurred. Please check your internet connection or try again later.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-purple-100 to-indigo-200 flex items-center justify-center p-4">
+      <div className="bg-white p-8 rounded-xl shadow-2xl w-full max-w-sm border border-gray-200 transform hover:scale-105 transition-transform duration-300">
+        <motion.h2
+          initial={{ y: -20, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ duration: 0.5 }}
+          className="text-3xl font-bold text-center text-purple-800 mb-6"
+        >
+          Admin Login
+        </motion.h2>
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div>
+            <label className="block text-gray-700 text-sm font-semibold mb-2" htmlFor="username">
+              Username
+            </label>
+            <input
+              type="text"
+              id="username"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 transition-colors"
+              placeholder="Enter your username"
+            />
+          </div>
+          <div>
+            <label className="block text-gray-700 text-sm font-semibold mb-2" htmlFor="password">
+              Password
+            </label>
+            <input
+              type="password"
+              id="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 transition-colors"
+              placeholder="Enter your password"
+            />
+          </div>
+          {error && (
+            <motion.p
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              className="text-red-600 text-sm font-medium text-center bg-red-50 p-2 rounded-md border border-red-200"
+            >
+              {error}
+            </motion.p>
+          )}
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            type="submit"
+            disabled={loading}
+            className="w-full bg-purple-700 text-white py-3 rounded-lg font-bold text-lg shadow-md hover:bg-purple-800 transition-colors duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {loading ? 'Logging in...' : 'Login'}
+          </motion.button>
+        </form>
+      </div>
+    </div>
+  );
+};
+
+export default AdminLogin;

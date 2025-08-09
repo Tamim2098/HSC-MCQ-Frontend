@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
+import Papa from 'papaparse';
 
 const AdminPanel = () => {
   const [formData, setFormData] = useState({
@@ -21,7 +22,9 @@ const AdminPanel = () => {
   const [editingQuestionId, setEditingQuestionId] = useState(null);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [questionToDelete, setQuestionToDelete] = useState(null);
-  
+  const [csvFile, setCsvFile] = useState(null);
+  const [showMessageModal, setShowMessageModal] = useState(false);
+
   const navigate = useNavigate();
   
   const backendUrl = 'https://hsc-mcq-backend.onrender.com';
@@ -29,9 +32,9 @@ const AdminPanel = () => {
   useEffect(() => {
     const token = localStorage.getItem('adminToken');
     if (!token) {
-      navigate('/admin/login');
+      navigate('/admin-login');
     } else {
-      fetchQuestions(); 
+      fetchQuestions();
     }
   }, [navigate]);
 
@@ -52,14 +55,18 @@ const AdminPanel = () => {
       }
       const data = await response.json();
       setQuestions(data);
-      console.log('Questions fetched successfully:', data);
     } catch (error) {
-      console.error('Error fetching questions:', error);
       setMessage('Error fetching questions.');
       setIsSuccess(false);
+      setShowMessageModal(true);
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem('adminToken');
+    navigate('/admin-login');
   };
 
   const handleChange = (e) => {
@@ -77,6 +84,12 @@ const AdminPanel = () => {
       ...prevData,
       options: newOptions,
     }));
+  };
+
+  const handleFileChange = (e) => {
+    if (e.target.files.length > 0) {
+      setCsvFile(e.target.files[0]);
+    }
   };
 
   const clearForm = () => {
@@ -103,7 +116,6 @@ const AdminPanel = () => {
     if (!token) return;
 
     try {
-      // এখানে URL টি 'add-question' থেকে 'addQuestion' করা হয়েছে।
       const response = await fetch(`${backendUrl}/api/admin/addQuestion`, {
         method: 'POST',
         headers: {
@@ -124,12 +136,78 @@ const AdminPanel = () => {
       clearForm();
       fetchQuestions();
     } catch (error) {
-      console.error('Submission Error:', error);
       setMessage(`Error: ${error.message}`);
       setIsSuccess(false);
     } finally {
       setLoading(false);
+      setShowMessageModal(true);
     }
+  };
+
+  const handleCsvUpload = () => {
+    if (!csvFile) {
+      setMessage('Please select a CSV file.');
+      setIsSuccess(false);
+      setShowMessageModal(true);
+      return;
+    }
+
+    setLoading(true);
+    setMessage('');
+    setIsSuccess(false);
+
+    Papa.parse(csvFile, {
+      header: true,
+      skipEmptyLines: true,
+      complete: async (results) => {
+        const questionsToAdd = results.data.map(row => ({
+          subject: row.subject || '',
+          year: row.year || '',
+          board: row.board || '',
+          question: row.question || '',
+          options: [row.option1 || '', row.option2 || '', row.option3 || '', row.option4 || ''],
+          answer: row.answer || '',
+          image: row.image || '',
+        }));
+
+        const token = localStorage.getItem('adminToken');
+        if (!token) return;
+
+        try {
+          const response = await fetch(`${backendUrl}/api/admin/add-questions-bulk`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify(questionsToAdd),
+          });
+
+          if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.message || 'Failed to add questions from CSV');
+          }
+
+          await response.json();
+          setMessage('Questions from CSV added successfully!');
+          setIsSuccess(true);
+          setCsvFile(null);
+          fetchQuestions();
+        } catch (error) {
+          setMessage(`Error: ${error.message}`);
+          setIsSuccess(false);
+        } finally {
+          setLoading(false);
+          setShowMessageModal(true);
+        }
+      },
+      error: (error) => {
+        setMessage(`Error parsing CSV file: ${error.message}`);
+        setIsSuccess(false);
+        setLoading(false);
+        setShowMessageModal(true);
+      }
+    });
   };
 
   const handleEdit = (question) => {
@@ -158,7 +236,7 @@ const AdminPanel = () => {
     try {
       const response = await fetch(`${backendUrl}/api/admin/update-question/${editingQuestionId}`, {
         method: 'PUT',
-        headers: { 
+        headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`
         },
@@ -176,11 +254,11 @@ const AdminPanel = () => {
       clearForm();
       fetchQuestions();
     } catch (error) {
-      console.error('Update Error:', error);
       setMessage(`Error: ${error.message}`);
       setIsSuccess(false);
     } finally {
       setLoading(false);
+      setShowMessageModal(true);
     }
   };
 
@@ -192,14 +270,16 @@ const AdminPanel = () => {
   const handleDelete = async () => {
     const questionId = questionToDelete;
     setShowConfirmModal(false);
-    
-    console.log(`handleDelete called for questionId: ${questionId}`);
+    setLoading(true);
+    setMessage('');
+    setIsSuccess(false);
     
     const token = localStorage.getItem('adminToken');
     if (!token) {
-      console.error('No token found. Cannot delete question.');
       setMessage('Not authorized. Please log in.');
       setIsSuccess(false);
+      setLoading(false);
+      setShowMessageModal(true);
       return;
     }
 
@@ -220,16 +300,37 @@ const AdminPanel = () => {
       setIsSuccess(true);
       fetchQuestions();
     } catch (error) {
-      console.error('Delete Error:', error);
       setMessage(`Error: ${error.message}`);
       setIsSuccess(false);
     } finally {
+      setLoading(false);
       setQuestionToDelete(null);
+      setShowMessageModal(true);
     }
+  };
+
+  const closeMessageModal = () => {
+    setShowMessageModal(false);
+    setMessage('');
   };
 
   return (
     <div className="min-h-screen bg-gray-100 p-8 flex flex-col items-center justify-center">
+      <div className="w-full max-w-4xl flex justify-between items-center mb-4">
+        <h1 className="text-3xl font-bold text-gray-800">Admin Dashboard</h1>
+        <motion.button
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+          onClick={handleLogout}
+          className="flex items-center px-4 py-2 bg-red-600 text-white font-bold rounded-full shadow-lg hover:bg-red-700 transition-colors text-sm"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+          </svg>
+          Logout
+        </motion.button>
+      </div>
+
       <motion.div
         initial={{ opacity: 0, scale: 0.9 }}
         animate={{ opacity: 1, scale: 1 }}
@@ -351,15 +452,43 @@ const AdminPanel = () => {
             )}
           </div>
         </form>
-        {message && (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className={`mt-6 p-4 rounded-lg text-center font-semibold ${isSuccess ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}
-          >
-            {message}
-          </motion.div>
-        )}
+      </motion.div>
+
+      <motion.div
+        initial={{ opacity: 0, scale: 0.9 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 0.5 }}
+        className="max-w-4xl w-full mx-auto bg-white rounded-2xl shadow-xl overflow-hidden p-8 mb-8"
+      >
+        <h2 className="text-3xl font-bold text-center text-purple-700 mb-6">Bulk Upload (from CSV)</h2>
+        <div className="space-y-4">
+          <p className="text-gray-600 text-center">
+            You can upload multiple questions at once using a CSV file. The CSV file must have the following headers: <br />
+            <code className="bg-gray-200 p-1 rounded-md text-sm font-mono">subject, year, board, question, option1, option2, option3, option4, answer, image</code>
+          </p>
+          <div className="flex flex-col md:flex-row items-center gap-4">
+            <input
+              type="file"
+              accept=".csv"
+              onChange={handleFileChange}
+              className="block w-full text-sm text-gray-500
+              file:mr-4 file:py-2 file:px-4
+              file:rounded-full file:border-0
+              file:text-sm file:font-semibold
+              file:bg-purple-50 file:text-purple-700
+              hover:file:bg-purple-100"
+            />
+            <motion.button
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              onClick={handleCsvUpload}
+              disabled={loading || !csvFile}
+              className="w-full md:w-auto py-3 px-6 text-white font-bold rounded-full shadow-lg transition-colors disabled:bg-gray-400 bg-green-600 hover:bg-green-700"
+            >
+              {loading ? 'Uploading...' : 'Upload CSV'}
+            </motion.button>
+          </div>
+        </div>
       </motion.div>
       
       {questions.length > 0 && (
@@ -434,6 +563,36 @@ const AdminPanel = () => {
         )}
       </AnimatePresence>
 
+      <AnimatePresence>
+        {showMessageModal && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-gray-800 bg-opacity-75 flex items-center justify-center p-4 z-50"
+          >
+            <motion.div
+              initial={{ scale: 0.8, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.8, opacity: 0 }}
+              className={`bg-white p-6 rounded-xl shadow-2xl w-full max-w-sm ${isSuccess ? 'border-green-500 border-t-4' : 'border-red-500 border-t-4'}`}
+            >
+              <h3 className={`text-lg font-bold mb-2 ${isSuccess ? 'text-green-700' : 'text-red-700'}`}>
+                {isSuccess ? 'Success!' : 'Error!'}
+              </h3>
+              <p className="text-gray-600 mb-6">{message}</p>
+              <div className="flex justify-end">
+                <button
+                  onClick={closeMessageModal}
+                  className="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg font-semibold hover:bg-gray-300 transition-colors"
+                >
+                  OK
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 };

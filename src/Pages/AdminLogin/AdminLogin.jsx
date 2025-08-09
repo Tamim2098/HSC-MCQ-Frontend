@@ -9,8 +9,6 @@ const AdminLogin = () => {
   const [error, setError] = useState(null);
   const navigate = useNavigate();
 
-  // লোকাল সার্ভারে চালানোর জন্য URL আপডেট করা হয়েছে
-  // নিশ্চিত করুন আপনার ব্যাকএন্ড সার্ভারটি এই পোর্টে চলছে
   const backendUrl = 'https://hsc-mcq-backend.onrender.com';
 
   const handleSubmit = async (e) => {
@@ -19,13 +17,10 @@ const AdminLogin = () => {
     setError(null);
 
     if (!username || !password) {
-      setError("Please enter both username and password.");
+      setError('Please enter both username and password.');
       setLoading(false);
       return;
     }
-    
-    console.log("Sending credentials to:", `${backendUrl}/api/admin/login`);
-    console.log("With data:", { username, password });
 
     try {
       const response = await fetch(`${backendUrl}/api/admin/login`, {
@@ -37,36 +32,21 @@ const AdminLogin = () => {
       });
 
       if (!response.ok) {
-        console.error('Server responded with an error status:', response.status);
-        try {
-          const errorData = await response.json();
-          setError(errorData.message || 'An error occurred. Please try again.');
-        } catch (jsonError) {
-          setError('Failed to connect to the login server. Please check the API endpoint.');
-        }
+        const errorData = await response.json();
+        setError(errorData.message || 'An error occurred. Please try again.');
         setLoading(false);
         return;
       }
 
       const data = await response.json();
-      console.log('Login successful:', data);
 
-      // Store the token in localStorage
       if (data.token) {
         localStorage.setItem('adminToken', data.token);
-
-        // A temporary fix: Adding a small delay to prevent a race condition
-        // The router's state might update before localStorage is fully available.
-        setTimeout(() => {
-            navigate('/admin', { replace: true });
-        }, 100);
-
+        navigate('/admin', { replace: true });
       } else {
         setError('Login successful, but no token received.');
       }
-
     } catch (err) {
-      console.error('Error during login:', err);
       setError('An error occurred. Please check your internet connection or try again later.');
     } finally {
       setLoading(false);

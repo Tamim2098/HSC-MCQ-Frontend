@@ -21,10 +21,6 @@ const App = () => {
         <Route path="/mcq" element={<MCQ />} />
         <Route path="/result" element={<Result />} />
         <Route path="/admin-login" element={<AdminLogin />} />
-        {/*
-          ProtectedRoute কে একটি র্যাপার কম্পোনেন্ট হিসেবে ব্যবহার করা হয়েছে।
-          এখন ProtectedRoute-এর ভিতরে থাকা AdminPanel-কে children prop হিসেবে পাঠানো হবে।
-        */}
         <Route
           path="/admin"
           element={

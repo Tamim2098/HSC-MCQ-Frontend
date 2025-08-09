@@ -3,19 +3,15 @@ import { useSearchParams, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const MCQ = () => {
-  // `useSearchParams` is used to get the subject, year, and board from the URL query string.
   const [searchParams] = useSearchParams();
-  // `useNavigate` is used to programmatically navigate to other pages, such as the results page.
   const navigate = useNavigate();
 
   const subject = searchParams.get('subject');
   const year = searchParams.get('year');
   const board = searchParams.get('board');
 
-  // Initial time for the quiz in seconds (25 minutes).
   const initialTime = 1500;
 
-  // State variables for the quiz logic.
   const [currentQuestions, setCurrentQuestions] = useState([]);
   const [timeLeft, setTimeLeft] = useState(initialTime);
   const [answers, setAnswers] = useState({});
@@ -24,11 +20,8 @@ const MCQ = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // The backend URL has been updated to point to a local server for consistency.
   const backendUrl = 'https://hsc-mcq-backend.onrender.com';
 
-  // This useEffect runs once when the component mounts to fetch questions.
-  // It checks for query parameters and then calls `fetchNewQuestions`.
   useEffect(() => {
     if (!subject || !year || !board) {
       setError('Please select a subject, year, and board to view questions.');
@@ -36,7 +29,6 @@ const MCQ = () => {
       return;
     }
 
-    // Clear previous quiz data from local storage to start a fresh quiz.
     localStorage.removeItem('quizQuestions');
     localStorage.removeItem('quizAnswers');
     localStorage.removeItem('quizTimeLeft');
@@ -46,7 +38,6 @@ const MCQ = () => {
     fetchNewQuestions();
   }, [subject, year, board]);
 
-  // Fetches new questions from the backend based on the URL parameters.
   const fetchNewQuestions = async () => {
     setLoading(true);
     setError(null);
@@ -67,34 +58,27 @@ const MCQ = () => {
         setError('No questions found for this subject, year, and board.');
       }
     } catch (err) {
-      console.error(err);
       setError('Error loading questions. Please try again.');
     } finally {
       setLoading(false);
     }
   };
 
-  // This useEffect manages the quiz timer.
   useEffect(() => {
-    // Stop the timer if the quiz is loading, has an error, is submitted, or time is up.
     if (loading || error || isSubmitted || timeLeft <= 0) {
-      // If time runs out, automatically submit the quiz.
       if (timeLeft <= 0 && !isSubmitted) {
         handleSubmit();
       }
       return;
     }
 
-    // Set up a new timer to decrement `timeLeft` every second.
     const timer = setInterval(() => {
       setTimeLeft((prevTime) => prevTime - 1);
     }, 1000);
 
-    // Clean up the timer when the component unmounts or the dependencies change.
     return () => clearInterval(timer);
   }, [timeLeft, isSubmitted, loading, error]);
 
-  // This useEffect prevents the user from accidentally leaving the page during the quiz.
   useEffect(() => {
     const handleBeforeUnload = (event) => {
       if (!isSubmitted) {
@@ -105,47 +89,38 @@ const MCQ = () => {
 
     window.addEventListener('beforeunload', handleBeforeUnload);
 
-    // Clean up the event listener when the component unmounts.
     return () => {
       window.removeEventListener('beforeunload', handleBeforeUnload);
     };
   }, [isSubmitted]);
 
-  // Handles a user's answer selection.
   const handleAnswerChange = (event) => {
     const questionId = currentQuestionIndex;
-    // Only allow answering if the question has not been answered yet.
     if (!answers[questionId]) {
       const newAnswers = { ...answers, [questionId]: event.target.value };
       setAnswers(newAnswers);
     }
   };
 
-  // Moves to the next question.
   const handleNextQuestion = () => {
     if (currentQuestionIndex < currentQuestions.length - 1) {
       setCurrentQuestionIndex(currentQuestionIndex + 1);
     }
   };
 
-  // Navigates to a specific question when a question number button is clicked.
   const handleQuestionButtonClick = (index) => {
     setCurrentQuestionIndex(index);
   };
 
-  // Submits the quiz and navigates to the result page.
   const handleSubmit = () => {
     setIsSubmitted(true);
-    // Use a short delay to allow for the submit animation to run before navigating.
     setTimeout(() => {
-      // Clear all quiz-related data from local storage.
       localStorage.removeItem('quizQuestions');
       localStorage.removeItem('quizAnswers');
       localStorage.removeItem('quizTimeLeft');
       localStorage.removeItem('quizCurrentIndex');
       localStorage.removeItem('quizParams');
 
-      // Navigate to the result page, passing the quiz data via state.
       navigate('/result', {
         state: {
           answers,
@@ -157,7 +132,6 @@ const MCQ = () => {
     }, 800);
   };
 
-  // Formats the remaining time from seconds to a MM:SS string.
   const formatTime = (seconds) => {
     const minutes = Math.floor(seconds / 60);
     const remainingSeconds = seconds % 60;
@@ -166,7 +140,6 @@ const MCQ = () => {
       .padStart(2, '0')}`;
   };
 
-  // Loading state UI.
   if (loading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-indigo-100 to-purple-200 p-8 flex items-center justify-center">
@@ -177,7 +150,6 @@ const MCQ = () => {
     );
   }
 
-  // Error state UI.
   if (error) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-indigo-100 to-purple-200 p-8 flex flex-col items-center justify-center text-center">
@@ -188,7 +160,6 @@ const MCQ = () => {
     );
   }
 
-  // No questions available state UI.
   if (!currentQuestions || currentQuestions.length === 0) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-indigo-100 to-purple-200 p-8 flex items-center justify-center">

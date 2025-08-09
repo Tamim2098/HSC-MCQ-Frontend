@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import Papa from 'papaparse'; // PapaParse লাইব্রেরি ইম্পোর্ট করা হলো
 
 const AdminPanel = () => {
   const [formData, setFormData] = useState({
@@ -22,8 +21,7 @@ const AdminPanel = () => {
   const [editingQuestionId, setEditingQuestionId] = useState(null);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [questionToDelete, setQuestionToDelete] = useState(null);
-  const [csvFile, setCsvFile] = useState(null); // CSV ফাইল হ্যান্ডেল করার জন্য নতুন state
-
+  
   const navigate = useNavigate();
   
   const backendUrl = 'https://hsc-mcq-backend.onrender.com';
@@ -33,7 +31,7 @@ const AdminPanel = () => {
     if (!token) {
       navigate('/admin/login');
     } else {
-      fetchQuestions();
+      fetchQuestions(); 
     }
   }, [navigate]);
 
@@ -81,12 +79,6 @@ const AdminPanel = () => {
     }));
   };
 
-  const handleFileChange = (e) => {
-    if (e.target.files.length > 0) {
-      setCsvFile(e.target.files[0]);
-    }
-  };
-
   const clearForm = () => {
     setFormData({
       subject: '',
@@ -111,6 +103,7 @@ const AdminPanel = () => {
     if (!token) return;
 
     try {
+      // এখানে URL টি 'add-question' থেকে 'addQuestion' করা হয়েছে।
       const response = await fetch(`${backendUrl}/api/admin/addQuestion`, {
         method: 'POST',
         headers: {
@@ -139,72 +132,6 @@ const AdminPanel = () => {
     }
   };
 
-  const handleCsvUpload = () => {
-    if (!csvFile) {
-      setMessage('Please select a CSV file.');
-      setIsSuccess(false);
-      return;
-    }
-
-    setLoading(true);
-    setMessage('');
-    setIsSuccess(false);
-
-    Papa.parse(csvFile, {
-      header: true,
-      skipEmptyLines: true,
-      complete: async (results) => {
-        const questionsToAdd = results.data.map(row => ({
-          subject: row.subject || '',
-          year: row.year || '',
-          board: row.board || '',
-          question: row.question || '',
-          options: [row.option1 || '', row.option2 || '', row.option3 || '', row.option4 || ''],
-          answer: row.answer || '',
-          image: row.image || '',
-        }));
-
-        const token = localStorage.getItem('adminToken');
-        if (!token) return;
-
-        try {
-          // নতুন বাল্ক আপলোড API endpoint
-          const response = await fetch(`${backendUrl}/api/admin/add-questions-bulk`, {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              'Authorization': `Bearer ${token}`
-            },
-            body: JSON.stringify(questionsToAdd),
-          });
-
-          if (!response.ok) {
-            const errorData = await response.json();
-            throw new Error(errorData.message || 'Failed to add questions from CSV');
-          }
-
-          await response.json();
-          setMessage('Questions from CSV added successfully!');
-          setIsSuccess(true);
-          setCsvFile(null); // ফাইল রিসেট করা
-          fetchQuestions();
-        } catch (error) {
-          console.error('CSV Upload Error:', error);
-          setMessage(`Error: ${error.message}`);
-          setIsSuccess(false);
-        } finally {
-          setLoading(false);
-        }
-      },
-      error: (error) => {
-        console.error('PapaParse Error:', error);
-        setMessage(`Error parsing CSV file: ${error.message}`);
-        setIsSuccess(false);
-        setLoading(false);
-      }
-    });
-  };
-
   const handleEdit = (question) => {
     setFormData({
       subject: question.subject,
@@ -231,7 +158,7 @@ const AdminPanel = () => {
     try {
       const response = await fetch(`${backendUrl}/api/admin/update-question/${editingQuestionId}`, {
         method: 'PUT',
-        headers: {
+        headers: { 
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`
         },
@@ -303,7 +230,6 @@ const AdminPanel = () => {
 
   return (
     <div className="min-h-screen bg-gray-100 p-8 flex flex-col items-center justify-center">
-      {/* Add/Edit Question Form */}
       <motion.div
         initial={{ opacity: 0, scale: 0.9 }}
         animate={{ opacity: 1, scale: 1 }}
@@ -425,44 +351,6 @@ const AdminPanel = () => {
             )}
           </div>
         </form>
-      </motion.div>
-
-      {/* CSV Upload Section - This is the new section */}
-      <motion.div
-        initial={{ opacity: 0, scale: 0.9 }}
-        animate={{ opacity: 1, scale: 1 }}
-        transition={{ duration: 0.5 }}
-        className="max-w-4xl w-full mx-auto bg-white rounded-2xl shadow-xl overflow-hidden p-8 mb-8"
-      >
-        <h2 className="text-3xl font-bold text-center text-purple-700 mb-6">Bulk Upload (from CSV)</h2>
-        <div className="space-y-4">
-          <p className="text-gray-600 text-center">
-            You can upload multiple questions at once using a CSV file. The CSV file must have the following headers: <br />
-            <code className="bg-gray-200 p-1 rounded-md text-sm font-mono">subject, year, board, question, option1, option2, option3, option4, answer, image</code>
-          </p>
-          <div className="flex flex-col md:flex-row items-center gap-4">
-            <input
-              type="file"
-              accept=".csv"
-              onChange={handleFileChange}
-              className="block w-full text-sm text-gray-500
-              file:mr-4 file:py-2 file:px-4
-              file:rounded-full file:border-0
-              file:text-sm file:font-semibold
-              file:bg-purple-50 file:text-purple-700
-              hover:file:bg-purple-100"
-            />
-            <motion.button
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-              onClick={handleCsvUpload}
-              disabled={loading || !csvFile}
-              className="w-full md:w-auto py-3 px-6 text-white font-bold rounded-full shadow-lg transition-colors disabled:bg-gray-400 bg-green-600 hover:bg-green-700"
-            >
-              {loading ? 'Uploading...' : 'Upload CSV'}
-            </motion.button>
-          </div>
-        </div>
         {message && (
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -474,7 +362,6 @@ const AdminPanel = () => {
         )}
       </motion.div>
       
-      {/* Existing Questions List */}
       {questions.length > 0 && (
         <motion.div
           initial={{ opacity: 0, scale: 0.9 }}
@@ -512,7 +399,6 @@ const AdminPanel = () => {
         </motion.div>
       )}
 
-      {/* Confirmation Modal */}
       <AnimatePresence>
         {showConfirmModal && (
           <motion.div

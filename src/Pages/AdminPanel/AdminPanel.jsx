@@ -24,7 +24,7 @@ const AdminPanel = () => {
   
   const navigate = useNavigate();
   
-  const backendUrl = 'http://localhost:5000';
+  const backendUrl = 'https://hsc-mcq-backend.onrender.com';
 
   useEffect(() => {
     const token = localStorage.getItem('adminToken');

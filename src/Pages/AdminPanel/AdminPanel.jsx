@@ -24,16 +24,14 @@ const AdminPanel = () => {
   
   const navigate = useNavigate();
   
-  // The backend URL has been updated to point to a local server for consistency.
-  const backendUrl = 'https://hsc-mcq-backend.onrender.com';
+  const backendUrl = 'http://localhost:5000';
 
-  // Component mount হওয়ার সময় টোকেন আছে কিনা চেক করা হচ্ছে।
   useEffect(() => {
     const token = localStorage.getItem('adminToken');
     if (!token) {
       navigate('/admin/login');
     } else {
-      fetchQuestions(); // টোকেন থাকলে প্রশ্নগুলো লোড করার জন্য কল করা হচ্ছে।
+      fetchQuestions(); 
     }
   }, [navigate]);
 
@@ -105,9 +103,10 @@ const AdminPanel = () => {
     if (!token) return;
 
     try {
-      const response = await fetch(`${backendUrl}/api/admin/add-question`, {
+      // এখানে URL টি 'add-question' থেকে 'addQuestion' করা হয়েছে।
+      const response = await fetch(`${backendUrl}/api/admin/addQuestion`, {
         method: 'POST',
-        headers: { 
+        headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`
         },
@@ -185,7 +184,6 @@ const AdminPanel = () => {
     }
   };
 
-  // Function to show the confirmation modal
   const handleDeleteClick = (questionId) => {
     setQuestionToDelete(questionId);
     setShowConfirmModal(true);
@@ -193,9 +191,8 @@ const AdminPanel = () => {
 
   const handleDelete = async () => {
     const questionId = questionToDelete;
-    setShowConfirmModal(false); // Hide the modal immediately
+    setShowConfirmModal(false);
     
-    // এই console.log টি দিয়ে যাচাই করুন যে ফাংশনটি কল হচ্ছে কিনা
     console.log(`handleDelete called for questionId: ${questionId}`);
     
     const token = localStorage.getItem('adminToken');

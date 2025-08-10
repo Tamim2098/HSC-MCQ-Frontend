@@ -460,7 +460,7 @@ const AdminPanel = () => {
         transition={{ duration: 0.5 }}
         className="max-w-4xl w-full mx-auto bg-white rounded-2xl shadow-xl overflow-hidden p-8 mb-8"
       >
-        <h2 className="text-3xl font-bold text-center text-purple-700 mb-6">Bulk Upload (from CSV)</h2>
+        <h2 className="text-3xl font-bold text-center text-purple-700 mb-6">Upload (from CSV)</h2>
         <div className="space-y-4">
           <p className="text-gray-600 text-center">
             You can upload multiple questions at once using a CSV file. The CSV file must have the following headers: <br />

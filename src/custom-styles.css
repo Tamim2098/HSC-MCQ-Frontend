@@ -1,0 +1,49 @@
+@import url('https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;600;700&display=swap');
+
+.bangla-font {
+  font-family: 'Hind Siliguri', 'Roboto', sans-serif;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+}
+
+.katex .text-font {
+  font-family: 'Hind Siliguri', 'Roboto', sans-serif !important;
+  white-space: normal !important;
+}
+
+.katex-display {
+  font-size: 1.2rem;
+  width: 100%;
+  overflow-x: auto;
+}
+
+@media (max-width: 768px) {
+  .katex-display {
+    font-size: 1rem;
+  }
+}
+
+@media (max-width: 576px) {
+  .katex-display {
+    font-size: 0.9rem;
+  }
+}
+
+.katex {
+  font-size: 1.1rem;
+  white-space: normal;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+}
+
+@media (max-width: 768px) {
+  .katex {
+    font-size: 1rem;
+  }
+}
+
+@media (max-width: 576px) {
+  .katex {
+    font-size: 0.9rem;
+  }
+}

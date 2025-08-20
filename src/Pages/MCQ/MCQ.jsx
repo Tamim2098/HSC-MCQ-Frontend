@@ -196,7 +196,7 @@ const MCQ = () => {
   const [showGrid, setShowGrid] = useState(false);
 
   const timerRef = useRef(null);
-  const backendUrl = 'https://hsc-mcq-hub-backend.onrender.com';
+  const backendUrl = 'https://hsc-mcq-backend.onrender.com';
 
   const fetchQuestions = useMemo(() => {
     return async () => {

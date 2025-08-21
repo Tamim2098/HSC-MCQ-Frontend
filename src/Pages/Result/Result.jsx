@@ -125,6 +125,7 @@ const Result = () => {
                         <p className="font-medium text-gray-800 leading-relaxed">
                           {renderTextWithMath(q.question)}
                         </p>
+                        {q.image && <div className="mt-4 text-center"><img src={q.image} alt="Question" className="max-w-full max-h-64 mx-auto rounded-lg border border-slate-200 shadow-sm" /></div>}
                       </div>
                     </div>
 

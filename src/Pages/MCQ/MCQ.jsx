@@ -75,7 +75,7 @@ const Sidebar = ({ questions, currentQuestionIndex, answers, handleQuestionSelec
   <div className="hidden xl:block">
     <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} className="bg-white rounded-2xl shadow-lg border border-slate-200 p-4 sticky top-4">
       <h3 className="font-semibold text-slate-800 mb-4 flex items-center gap-2"><FileText className="w-5 h-5" />Questions</h3>
-      <div className="grid grid-cols-5 gap-2">
+      <div className="grid grid-cols-5 gap-4">
         {questions.map((_, i) => (
           <motion.button
             key={i}
@@ -92,92 +92,90 @@ const Sidebar = ({ questions, currentQuestionIndex, answers, handleQuestionSelec
   </div>
 );
 
-const MainContent = ({ currentQuestion, currentQuestionIndex, totalQuestions, answers, handleAnswerChange, navigateQuestion, handleSubmit, showGrid, setShowGrid, handleQuestionSelect, questions }) => {
-  const renderTextWithMath = (text) => {
-    if (!text) return null;
-    const mathRegex = /(\$\$[^$]+\$\$|\$[^$]+\$|\\begin\{.*?\}.*?\\end\{.*?\})/g;
-    const parts = text.split(mathRegex);
+const renderTextWithMath = (text) => {
+  if (!text) return null;
+  const mathRegex = /(\$\$[^$]+\$\$|\$[^$]+\$|\\begin\{.*?\}.*?\\end\{.*?\})/g;
+  const parts = text.split(mathRegex);
 
-    return parts.map((part, index) => {
-      if (!part) return null;
+  return parts.map((part, index) => {
+    if (!part) return null;
 
-      if (part.startsWith('$$') && part.endsWith('$$')) {
-        const mathContent = part.slice(2, -2);
-        return <BlockMath key={index} math={mathContent} />;
-      } else if (part.startsWith('\\begin{')) {
-        return <BlockMath key={index} math={part} />;
-      } else if (part.startsWith('$') && part.endsWith('$')) {
-        const mathContent = part.slice(1, -1);
-        return <InlineMath key={index} math={mathContent} />;
-      } else {
-        return <span key={index} className="bangla-font">{part}</span>;
-      }
-    });
-  };
-
-  return (
-    <div className="xl:col-span-3">
-      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="bg-white rounded-2xl shadow-lg border border-slate-200 overflow-hidden">
-        <div className="bg-slate-50 border-b border-slate-200 p-4 lg:p-6">
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-purple-600 text-white rounded-full flex items-center justify-center font-bold">{currentQuestionIndex + 1}</div>
-              <div>
-                <p className="font-semibold text-slate-800">Question {currentQuestionIndex + 1} of {totalQuestions}</p>
-                <p className="text-sm text-slate-500">{answers?.[currentQuestionIndex] ? 'Answered' : 'Not answered'}</p>
-              </div>
-            </div>
-            <button onClick={() => setShowGrid(!showGrid)} className="xl:hidden bg-purple-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-purple-700 transition-colors">View All Questions</button>
-          </div>
-        </div>
-        <AnimatePresence>
-          {showGrid && (
-            <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }} className="xl:hidden bg-slate-50 border-b border-slate-200 p-4">
-              <div className="grid grid-cols-8 sm:grid-cols-10 gap-2">
-                {questions.map((_, i) => (
-                  <motion.button key={i} whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.95 }} onClick={() => handleQuestionSelect(i)} className={`w-10 h-10 rounded-lg text-sm font-semibold transition-all duration-200 flex items-center justify-center ${i === currentQuestionIndex ? 'bg-purple-600 text-white shadow-lg' : answers?.[i] ? 'bg-emerald-100 text-emerald-700 border-2 border-emerald-200' : 'bg-white text-slate-600 hover:bg-slate-100 border-2 border-slate-200'}`}>
-                    {answers?.[i] ? <CheckCircle className="w-4 h-4" /> : i + 1}
-                  </motion.button>
-                ))}
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
-        <div className="p-4 lg:p-6">
-          <AnimatePresence mode="wait">
-            <motion.div key={currentQuestionIndex} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }} transition={{ duration: 0.3 }}>
-              <div className="bg-slate-50 rounded-xl p-4 lg:p-6 mb-6 border border-slate-200">
-                <p className="text-lg lg:text-xl font-medium text-slate-800 leading-relaxed">
-                  {renderTextWithMath(currentQuestion?.question)}
-                </p>
-                {currentQuestion?.image && <div className="mt-4 text-center"><img src={currentQuestion.image} alt="Question" className="max-w-full max-h-64 mx-auto rounded-lg border border-slate-200 shadow-sm" /></div>}
-              </div>
-              <div className="space-y-3">
-                {currentQuestion?.options?.map((option, i) => (
-                  <motion.label key={i} htmlFor={`option-${currentQuestionIndex}-${i}`} initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: i * 0.1 }} className={`relative flex items-start gap-4 p-4 lg:p-5 rounded-xl cursor-pointer transition-all duration-200 group border-2 ${answers?.[currentQuestionIndex] === option ? 'bg-purple-600 text-white border-purple-600 shadow-lg transform scale-[1.02]' : 'bg-white hover:bg-slate-50 text-slate-800 border-slate-200 hover:border-slate-300 shadow-sm hover:shadow-md'}`}>
-                    <input type="radio" id={`option-${currentQuestionIndex}-${i}`} name={`question-${currentQuestionIndex}`} className="hidden" value={option} checked={answers?.[currentQuestionIndex] === option} onChange={() => handleAnswerChange(option)} disabled={!!answers?.[currentQuestionIndex]} />
-                    <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm flex-shrink-0 mt-0.5 ${answers?.[currentQuestionIndex] === option ? 'bg-white text-purple-600' : 'bg-purple-100 text-purple-700 group-hover:bg-purple-200'}`}>{String.fromCharCode(65 + i)}</div>
-                    <span className="flex-1 font-medium text-base lg:text-lg leading-relaxed">{renderTextWithMath(option)}</span>
-                    {answers?.[currentQuestionIndex] === option && <CheckCircle className="w-6 h-6 flex-shrink-0 mt-0.5" />}
-                  </motion.label>
-                ))}
-              </div>
-              <div className="mt-6 flex flex-col sm:flex-row justify-between gap-4">
-                <motion.button whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} onClick={() => navigateQuestion('prev')} disabled={currentQuestionIndex === 0} className="w-full sm:w-auto px-6 py-3 rounded-full font-semibold transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed bg-slate-200 text-slate-700 hover:bg-slate-300 flex items-center justify-center gap-2">
-                  <ChevronLeft className="w-5 h-5" /> Previous
-                </motion.button>
-                <motion.button whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} onClick={currentQuestionIndex === totalQuestions - 1 ? handleSubmit : () => navigateQuestion('next')} className="w-full sm:w-auto px-6 py-3 rounded-full font-semibold transition-all duration-200 bg-purple-600 text-white hover:bg-purple-700 flex items-center justify-center gap-2">
-                  {currentQuestionIndex === totalQuestions - 1 ? 'Submit' : 'Next Question'}
-                  <ChevronRight className="w-5 h-5" />
-                </motion.button>
-              </div>
-            </motion.div>
-          </AnimatePresence>
-        </div>
-      </motion.div>
-    </div>
-  );
+    if (part.startsWith('$$') && part.endsWith('$$')) {
+      const mathContent = part.slice(2, -2);
+      return <BlockMath key={index} math={mathContent} />;
+    } else if (part.startsWith('\\begin{')) {
+      return <BlockMath key={index} math={part} />;
+    } else if (part.startsWith('$') && part.endsWith('$')) {
+      const mathContent = part.slice(1, -1);
+      return <InlineMath key={index} math={mathContent} />;
+    } else {
+      return <span key={index} className="bangla-font">{part}</span>;
+    }
+  });
 };
+
+const MainContent = ({ currentQuestion, currentQuestionIndex, totalQuestions, answers, handleAnswerChange, navigateQuestion, handleSubmit, showGrid, setShowGrid, handleQuestionSelect, questions }) => (
+  <div className="xl:col-span-3">
+    <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="bg-white rounded-2xl shadow-lg border border-slate-200 overflow-hidden">
+      <div className="bg-slate-50 border-b border-slate-200 p-4 lg:p-6">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 bg-purple-600 text-white rounded-full flex items-center justify-center font-bold">{currentQuestionIndex + 1}</div>
+            <div>
+              <p className="font-semibold text-slate-800">Question {currentQuestionIndex + 1} of {totalQuestions}</p>
+              <p className="text-sm text-slate-500">{answers?.[currentQuestionIndex] ? 'Answered' : 'Not answered'}</p>
+            </div>
+          </div>
+          <button onClick={() => setShowGrid(!showGrid)} className="xl:hidden bg-purple-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-purple-700 transition-colors">View All Questions</button>
+        </div>
+      </div>
+      <AnimatePresence>
+        {showGrid && (
+          <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }} className="xl:hidden bg-slate-50 border-b border-slate-200 p-4">
+            <div className="grid grid-cols-8 sm:grid-cols-10 gap-4">
+              {questions.map((_, i) => (
+                <motion.button key={i} whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.95 }} onClick={() => handleQuestionSelect(i)} className={`w-10 h-10 rounded-lg text-sm font-semibold transition-all duration-200 flex items-center justify-center ${i === currentQuestionIndex ? 'bg-purple-600 text-white shadow-lg' : answers?.[i] ? 'bg-emerald-100 text-emerald-700 border-2 border-emerald-200' : 'bg-white text-slate-600 hover:bg-slate-100 border-2 border-slate-200'}`}>
+                  {answers?.[i] ? <CheckCircle className="w-4 h-4" /> : i + 1}
+                </motion.button>
+              ))}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+      <div className="p-4 lg:p-6">
+        <AnimatePresence mode="wait">
+          <motion.div key={currentQuestionIndex} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }} transition={{ duration: 0.3 }}>
+            <div className="bg-slate-50 rounded-xl p-4 lg:p-6 mb-6 border border-slate-200">
+              <p className="text-lg lg:text-xl font-medium text-slate-800 leading-relaxed math-render-container">
+                {renderTextWithMath(currentQuestion?.question)}
+              </p>
+              {currentQuestion?.image && <div className="mt-4 text-center"><img src={currentQuestion.image} alt="Question" className="max-w-full max-h-64 mx-auto rounded-lg border border-slate-200 shadow-sm" /></div>}
+            </div>
+            <div className="space-y-4 md:space-y-6">
+              {currentQuestion?.options?.map((option, i) => (
+                <motion.label key={i} htmlFor={`option-${currentQuestionIndex}-${i}`} initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: i * 0.1 }} className={`relative flex items-start gap-4 p-4 lg:p-5 rounded-xl cursor-pointer transition-all duration-200 group border-2 ${answers?.[currentQuestionIndex] === option ? 'bg-purple-600 text-white border-purple-600 shadow-lg transform scale-[1.02]' : 'bg-white hover:bg-slate-50 text-slate-800 border-slate-200 hover:border-slate-300 shadow-sm hover:shadow-md'}`}>
+                  <input type="radio" id={`option-${currentQuestionIndex}-${i}`} name={`question-${currentQuestionIndex}`} className="hidden" value={option} checked={answers?.[currentQuestionIndex] === option} onChange={() => handleAnswerChange(option)} disabled={!!answers?.[currentQuestionIndex]} />
+                  <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm flex-shrink-0 mt-0.5 ${answers?.[currentQuestionIndex] === option ? 'bg-white text-purple-600' : 'bg-purple-100 text-purple-700 group-hover:bg-purple-200'}`}>{String.fromCharCode(65 + i)}</div>
+                  <span className="flex-1 font-medium text-base lg:text-lg leading-relaxed">{renderTextWithMath(option)}</span>
+                  {answers?.[currentQuestionIndex] === option && <CheckCircle className="w-6 h-6 flex-shrink-0 mt-0.5" />}
+                </motion.label>
+              ))}
+            </div>
+            <div className="mt-6 flex flex-col sm:flex-row justify-between gap-4">
+              <motion.button whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} onClick={() => navigateQuestion('prev')} disabled={currentQuestionIndex === 0} className="w-full sm:w-auto px-6 py-3 rounded-full font-semibold transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed bg-slate-200 text-slate-700 hover:bg-slate-300 flex items-center justify-center gap-2">
+                <ChevronLeft className="w-5 h-5" /> Previous
+              </motion.button>
+              <motion.button whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} onClick={currentQuestionIndex === totalQuestions - 1 ? handleSubmit : () => navigateQuestion('next')} className="w-full sm:w-auto px-6 py-3 rounded-full font-semibold transition-all duration-200 bg-purple-600 text-white hover:bg-purple-700 flex items-center justify-center gap-2">
+                {currentQuestionIndex === totalQuestions - 1 ? 'Submit' : 'Next Question'}
+                <ChevronRight className="w-5 h-5" />
+              </motion.button>
+            </div>
+          </motion.div>
+        </AnimatePresence>
+      </div>
+    </motion.div>
+  </div>
+);
 
 const MCQ = () => {
   const [searchParams] = useSearchParams();

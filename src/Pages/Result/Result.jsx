@@ -6,32 +6,32 @@ import { InlineMath, BlockMath } from 'react-katex';
 import 'katex/dist/katex.min.css';
 import './../../custom-styles.css';
 
+const renderTextWithMath = (text) => {
+  if (!text) return null;
+  const mathRegex = /(\$\$[^$]+\$\$|\$[^$]+\$|\\begin\{.*?\}.*?\\end\{.*?\})/g;
+  const parts = text.split(mathRegex);
+
+  return parts.map((part, index) => {
+    if (!part) return null;
+
+    if (part.startsWith('$$') && part.endsWith('$$')) {
+      const mathContent = part.slice(2, -2);
+      return <BlockMath key={index} math={mathContent} />;
+    } else if (part.startsWith('\\begin{')) {
+      return <BlockMath key={index} math={part} />;
+    } else if (part.startsWith('$') && part.endsWith('$')) {
+      const mathContent = part.slice(1, -1);
+      return <InlineMath key={index} math={mathContent} />;
+    } else {
+      return <span key={index} className="bangla-font">{part}</span>;
+    }
+  });
+};
+
 const Result = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { answers, totalQuestions, subject, currentQuestions } = location.state || {};
-
-  const renderTextWithMath = (text) => {
-    if (!text) return null;
-    const mathRegex = /(\$\$[^$]+\$\$|\$[^$]+\$|\\begin\{.*?\}.*?\\end\{.*?\})/g;
-    const parts = text.split(mathRegex);
-
-    return parts.map((part, index) => {
-      if (!part) return null;
-
-      if (part.startsWith('$$') && part.endsWith('$$')) {
-        const mathContent = part.slice(2, -2);
-        return <BlockMath key={index} math={mathContent} />;
-      } else if (part.startsWith('\\begin{')) {
-        return <BlockMath key={index} math={part} />;
-      } else if (part.startsWith('$') && part.endsWith('$')) {
-        const mathContent = part.slice(1, -1);
-        return <InlineMath key={index} math={mathContent} />;
-      } else {
-        return <span key={index} className="bangla-font">{part}</span>;
-      }
-    });
-  };
 
   if (!answers || !subject || !currentQuestions || currentQuestions.length === 0) {
     return (

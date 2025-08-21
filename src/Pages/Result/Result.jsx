@@ -113,12 +113,9 @@ const Result = () => {
                 const notAnswered = !answers?.[index];
 
                 return (
-                  <motion.div
+                  <div
                     key={index}
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ duration: 0.3, delay: index * 0.05 }}
-                    className={`bg-white rounded-lg p-5 shadow-sm text-left border-2 ${
+                    className={`bg-white rounded-lg p-5 shadow-sm text-left border-2 transition-colors duration-200 ${
                       isCorrect ? 'border-green-300' : 'border-red-300'
                     }`}
                   >
@@ -149,7 +146,7 @@ const Result = () => {
                         </p>
                       )}
                     </div>
-                  </motion.div>
+                  </div>
                 );
               })}
             </div>

@@ -153,12 +153,12 @@ const MainContent = ({ currentQuestion, currentQuestionIndex, totalQuestions, an
             </div>
             <div className="space-y-4 md:space-y-6">
               {currentQuestion?.options?.map((option, i) => (
-                <motion.label key={i} htmlFor={`option-${currentQuestionIndex}-${i}`} initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: i * 0.1 }} className={`relative flex items-start gap-4 p-4 lg:p-5 rounded-xl cursor-pointer transition-all duration-200 group border-2 ${answers?.[currentQuestionIndex] === option ? 'bg-purple-600 text-white border-purple-600 shadow-lg transform scale-[1.02]' : 'bg-white hover:bg-slate-50 text-slate-800 border-slate-200 hover:border-slate-300 shadow-sm hover:shadow-md'}`}>
+                <label key={i} htmlFor={`option-${currentQuestionIndex}-${i}`} className={`relative flex items-start gap-4 p-4 lg:p-5 rounded-xl cursor-pointer transition-all duration-200 group border-2 ${answers?.[currentQuestionIndex] === option ? 'bg-purple-600 text-white border-purple-600 shadow-lg' : 'bg-white hover:bg-slate-50 text-slate-800 border-slate-200 hover:border-slate-300 shadow-sm hover:shadow-md'}`}>
                   <input type="radio" id={`option-${currentQuestionIndex}-${i}`} name={`question-${currentQuestionIndex}`} className="hidden" value={option} checked={answers?.[currentQuestionIndex] === option} onChange={() => handleAnswerChange(option)} disabled={!!answers?.[currentQuestionIndex]} />
                   <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm flex-shrink-0 mt-0.5 ${answers?.[currentQuestionIndex] === option ? 'bg-white text-purple-600' : 'bg-purple-100 text-purple-700 group-hover:bg-purple-200'}`}>{String.fromCharCode(65 + i)}</div>
                   <span className="flex-1 font-medium text-base lg:text-lg leading-relaxed">{renderTextWithMath(option)}</span>
                   {answers?.[currentQuestionIndex] === option && <CheckCircle className="w-6 h-6 flex-shrink-0 mt-0.5" />}
-                </motion.label>
+                </label>
               ))}
             </div>
             <div className="mt-6 flex flex-col sm:flex-row justify-between gap-4">

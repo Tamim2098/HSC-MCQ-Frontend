@@ -2,6 +2,36 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 
+const cardVariants = {
+  hidden: { opacity: 0, y: 50, scale: 0.9 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    scale: 1,
+    transition: {
+      type: 'spring',
+      damping: 15,
+      stiffness: 100,
+      when: 'beforeChildren',
+      staggerChildren: 0.15,
+      delayChildren: 0.3
+    }
+  },
+};
+
+const itemVariants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: {
+      type: 'spring',
+      damping: 12,
+      stiffness: 150,
+    }
+  },
+};
+
 const AdminLogin = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
@@ -54,19 +84,26 @@ const AdminLogin = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-100 to-indigo-200 flex items-center justify-center p-4">
-      <div className="bg-white p-8 rounded-xl shadow-2xl w-full max-w-sm border border-gray-200 transform hover:scale-105 transition-transform duration-300">
+    <div className="min-h-screen bg-gradient-to-br from-white via-purple-50 to-purple-100 dark:from-gray-900 dark:via-gray-950 dark:to-black transition-colors duration-500 p-8 flex items-center justify-center overflow-hidden relative">
+      <div className="absolute inset-0 z-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-5 dark:opacity-10"></div>
+      
+      <div className="absolute top-1/2 left-1/2 w-96 h-96 -translate-x-1/2 -translate-y-1/2 rounded-full bg-purple-400/20 dark:bg-purple-700/10 blur-3xl animate-pulse-slow"></div>
+
+      <motion.div
+        variants={cardVariants}
+        initial="hidden"
+        animate="visible"
+        className="relative z-10 bg-white/30 dark:bg-gray-800/30 backdrop-blur-md p-8 rounded-2xl shadow-2xl w-full max-w-sm border border-white/20 dark:border-gray-700/50 transform transition-all duration-300 hover:shadow-3xl"
+      >
         <motion.h2
-          initial={{ y: -20, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          transition={{ duration: 0.5 }}
-          className="text-3xl font-bold text-center text-purple-800 mb-6"
+          variants={itemVariants}
+          className="text-3xl font-extrabold text-center bg-gradient-to-r from-purple-600 to-indigo-600 text-transparent bg-clip-text animate-text-gradient mb-6"
         >
           Admin Login
         </motion.h2>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <label className="block text-gray-700 text-sm font-semibold mb-2" htmlFor="username">
+        <form onSubmit={handleSubmit} className="space-y-6">
+          <motion.div variants={itemVariants}>
+            <label className="block text-gray-700 dark:text-gray-300 text-sm font-semibold mb-2" htmlFor="username">
               Username
             </label>
             <input
@@ -74,12 +111,12 @@ const AdminLogin = () => {
               id="username"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 transition-colors"
+              className="w-full px-4 py-3 border border-gray-300 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 transition-colors"
               placeholder="Enter your username"
             />
-          </div>
-          <div>
-            <label className="block text-gray-700 text-sm font-semibold mb-2" htmlFor="password">
+          </motion.div>
+          <motion.div variants={itemVariants}>
+            <label className="block text-gray-700 dark:text-gray-300 text-sm font-semibold mb-2" htmlFor="password">
               Password
             </label>
             <input
@@ -87,30 +124,32 @@ const AdminLogin = () => {
               id="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 transition-colors"
+              className="w-full px-4 py-3 border border-gray-300 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 transition-colors"
               placeholder="Enter your password"
             />
-          </div>
+          </motion.div>
           {error && (
             <motion.p
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              className="text-red-600 text-sm font-medium text-center bg-red-50 p-2 rounded-md border border-red-200"
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              className="text-red-600 dark:text-red-400 text-sm font-medium text-center bg-red-100/50 dark:bg-red-900/50 p-3 rounded-xl border border-red-200 dark:border-red-800"
             >
               {error}
             </motion.p>
           )}
           <motion.button
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
+            variants={itemVariants}
+            whileHover={{ scale: 1.02, y: -2 }}
+            whileTap={{ scale: 0.98 }}
             type="submit"
             disabled={loading}
-            className="w-full bg-purple-700 text-white py-3 rounded-lg font-bold text-lg shadow-md hover:bg-purple-800 transition-colors duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full bg-purple-600 text-white py-3 rounded-xl font-bold text-lg shadow-lg hover:bg-purple-700 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed relative overflow-hidden group"
           >
             {loading ? 'Logging in...' : 'Login'}
+             <span className="absolute inset-0 rounded-xl bg-purple-700 opacity-0 group-hover:opacity-100 transition-opacity duration-300 animate-pulse"></span>
           </motion.button>
         </form>
-      </div>
+      </motion.div>
     </div>
   );
 };

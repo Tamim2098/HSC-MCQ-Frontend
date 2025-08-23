@@ -3,6 +3,59 @@ import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import Papa from 'papaparse';
 
+const containerVariants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: {
+      type: 'spring',
+      damping: 15,
+      stiffness: 100,
+      when: 'beforeChildren',
+      staggerChildren: 0.1,
+    },
+  },
+};
+
+const itemVariants = {
+  hidden: { opacity: 0, y: 10 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: {
+      type: 'spring',
+      damping: 15,
+      stiffness: 100,
+    },
+  },
+};
+
+const listVariants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: {
+      when: 'beforeChildren',
+      staggerChildren: 0.05,
+    },
+  },
+};
+
+const cardItemVariants = {
+  hidden: { opacity: 0, scale: 0.95 },
+  visible: {
+    opacity: 1,
+    scale: 1,
+    transition: {
+      type: 'spring',
+      damping: 15,
+      stiffness: 100,
+    },
+  },
+};
+
 const AdminPanel = () => {
   const [formData, setFormData] = useState({
     subject: '',
@@ -26,7 +79,7 @@ const AdminPanel = () => {
   const [showMessageModal, setShowMessageModal] = useState(false);
 
   const navigate = useNavigate();
-  
+
   const backendUrl = 'https://hsc-mcq-backend.onrender.com';
 
   useEffect(() => {
@@ -47,8 +100,8 @@ const AdminPanel = () => {
       const response = await fetch(`${backendUrl}/api/admin/questions`, {
         method: 'GET',
         headers: {
-          'Authorization': `Bearer ${token}`
-        }
+          Authorization: `Bearer ${token}`,
+        },
       });
       if (!response.ok) {
         throw new Error('Failed to fetch questions');
@@ -120,7 +173,7 @@ const AdminPanel = () => {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
+          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify(formData),
       });
@@ -160,7 +213,7 @@ const AdminPanel = () => {
       header: true,
       skipEmptyLines: true,
       complete: async (results) => {
-        const questionsToAdd = results.data.map(row => ({
+        const questionsToAdd = results.data.map((row) => ({
           subject: row.subject || '',
           year: row.year || '',
           board: row.board || '',
@@ -178,7 +231,7 @@ const AdminPanel = () => {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
-              'Authorization': `Bearer ${token}`
+              Authorization: `Bearer ${token}`,
             },
             body: JSON.stringify(questionsToAdd),
           });
@@ -206,7 +259,7 @@ const AdminPanel = () => {
         setIsSuccess(false);
         setLoading(false);
         setShowMessageModal(true);
-      }
+      },
     });
   };
 
@@ -238,7 +291,7 @@ const AdminPanel = () => {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
+          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify(formData),
       });
@@ -273,7 +326,7 @@ const AdminPanel = () => {
     setLoading(true);
     setMessage('');
     setIsSuccess(false);
-    
+
     const token = localStorage.getItem('adminToken');
     if (!token) {
       setMessage('Not authorized. Please log in.');
@@ -287,10 +340,10 @@ const AdminPanel = () => {
       const response = await fetch(`${backendUrl}/api/admin/delete-question/${questionId}`, {
         method: 'DELETE',
         headers: {
-          'Authorization': `Bearer ${token}`
-        }
+          Authorization: `Bearer ${token}`,
+        },
       });
-      
+
       if (!response.ok) {
         throw new Error('Failed to delete question');
       }
@@ -315,218 +368,244 @@ const AdminPanel = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 p-8 flex flex-col items-center justify-center">
-      <div className="w-full max-w-4xl flex justify-between items-center mb-4">
-        <h1 className="text-3xl font-bold text-gray-800">Admin Dashboard</h1>
-        <motion.button
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
-          onClick={handleLogout}
-          className="flex items-center px-4 py-2 bg-red-600 text-white font-bold rounded-full shadow-lg hover:bg-red-700 transition-colors text-sm"
-        >
-          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-            <path strokeLinecap="round" strokeLinejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-          </svg>
-          Logout
-        </motion.button>
-      </div>
+    <div className="min-h-screen bg-gradient-to-br from-white via-purple-50 to-purple-100 dark:from-gray-900 dark:via-gray-950 dark:to-black transition-colors duration-500 p-8 flex flex-col items-center relative">
+      <div className="absolute inset-0 z-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-5 dark:opacity-10"></div>
+      <div className="absolute top-1/4 left-1/4 w-72 h-72 rounded-full bg-purple-400/20 dark:bg-purple-700/10 blur-3xl animate-pulse-slow"></div>
+      <div className="absolute bottom-1/4 right-1/4 w-64 h-64 rounded-full bg-indigo-400/20 dark:bg-indigo-700/10 blur-3xl animate-pulse-slow"></div>
 
       <motion.div
-        initial={{ opacity: 0, scale: 0.9 }}
-        animate={{ opacity: 1, scale: 1 }}
-        transition={{ duration: 0.5 }}
-        className="max-w-4xl w-full mx-auto bg-white rounded-2xl shadow-xl overflow-hidden p-8 mb-8"
+        variants={containerVariants}
+        initial="hidden"
+        animate="visible"
+        className="relative z-10 w-full max-w-4xl flex flex-col items-center"
       >
-        <h2 className="text-3xl font-bold text-center text-purple-700 mb-6">
-          {isEditMode ? 'Edit Question' : 'Add New Question'}
-        </h2>
+        <div className="w-full flex justify-between items-center mb-8">
+          <motion.h1
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ type: 'spring', damping: 15, stiffness: 100, delay: 0.2 }}
+            className="text-4xl font-extrabold bg-gradient-to-r from-purple-600 to-indigo-600 text-transparent bg-clip-text animate-text-gradient"
+          >
+            Admin Dashboard
+          </motion.h1>
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            onClick={handleLogout}
+            className="flex items-center px-4 py-2 bg-red-600 text-white font-bold rounded-full shadow-lg hover:bg-red-700 transition-colors text-sm"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+            </svg>
+            Logout
+          </motion.button>
+        </div>
 
-        <form onSubmit={isEditMode ? handleUpdateQuestion : handleAddQuestion} className="space-y-6">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div className="flex flex-col">
-              <label htmlFor="subject" className="text-sm font-medium text-gray-700">Subject</label>
-              <input
-                type="text"
-                id="subject"
-                name="subject"
-                value={formData.subject}
-                onChange={handleChange}
-                required
-                className="mt-1 p-3 border border-gray-300 rounded-lg focus:ring-purple-500 focus:border-purple-500 transition-all"
-              />
-            </div>
-            <div className="flex flex-col">
-              <label htmlFor="year" className="text-sm font-medium text-gray-700">Year</label>
-              <input
-                type="text"
-                id="year"
-                name="year"
-                value={formData.year}
-                onChange={handleChange}
-                required
-                className="mt-1 p-3 border border-gray-300 rounded-lg focus:ring-purple-500 focus:border-purple-500 transition-all"
-              />
-            </div>
-            <div className="flex flex-col">
-              <label htmlFor="board" className="text-sm font-medium text-gray-700">Board</label>
-              <input
-                type="text"
-                id="board"
-                name="board"
-                value={formData.board}
-                onChange={handleChange}
-                required
-                className="mt-1 p-3 border border-gray-300 rounded-lg focus:ring-purple-500 focus:border-purple-500 transition-all"
-              />
-            </div>
-          </div>
-          <div className="flex flex-col">
-            <label htmlFor="question" className="text-sm font-medium text-gray-700">Question</label>
-            <textarea
-              id="question"
-              name="question"
-              value={formData.question}
-              onChange={handleChange}
-              rows="4"
-              required
-              className="mt-1 p-3 border border-gray-300 rounded-lg focus:ring-purple-500 focus:border-purple-500 transition-all"
-            ></textarea>
-          </div>
-          <div className="flex flex-col">
-            <label htmlFor="image" className="text-sm font-medium text-gray-700">Image URL (optional)</label>
-            <input
-              type="text"
-              id="image"
-              name="image"
-              value={formData.image}
-              onChange={handleChange}
-              className="mt-1 p-3 border border-gray-300 rounded-lg focus:ring-purple-500 focus:border-purple-500 transition-all"
-            />
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {formData.options.map((option, index) => (
-              <div key={index} className="flex flex-col">
-                <label className="text-sm font-medium text-gray-700">Option {String.fromCharCode(65 + index)}</label>
+        <motion.div
+          variants={containerVariants}
+          className="w-full bg-white/50 dark:bg-gray-800/50 backdrop-blur-md rounded-2xl shadow-2xl overflow-hidden p-8 mb-8 border border-white/20 dark:border-gray-700/50"
+        >
+          <motion.h2 variants={itemVariants} className="text-3xl font-bold text-center text-purple-700 dark:text-purple-400 mb-6">
+            {isEditMode ? 'Edit Question' : 'Add New Question'}
+          </motion.h2>
+
+          <motion.form onSubmit={isEditMode ? handleUpdateQuestion : handleAddQuestion} className="space-y-6">
+            <motion.div variants={itemVariants} className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div className="flex flex-col">
+                <label htmlFor="subject" className="text-sm font-medium text-gray-700 dark:text-gray-300">Subject</label>
                 <input
                   type="text"
-                  value={option}
-                  onChange={(e) => handleOptionChange(index, e)}
+                  id="subject"
+                  name="subject"
+                  value={formData.subject}
+                  onChange={handleChange}
                   required
-                  className="mt-1 p-3 border border-gray-300 rounded-lg focus:ring-purple-500 focus:border-purple-500 transition-all"
+                  className="mt-1 p-3 border border-gray-300 dark:border-gray-700 rounded-lg focus:ring-purple-500 focus:border-purple-500 transition-all bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
                 />
               </div>
-            ))}
-          </div>
-          <div className="flex flex-col">
-            <label htmlFor="answer" className="text-sm font-medium text-gray-700">Correct Answer</label>
-            <input
-              type="text"
-              id="answer"
-              name="answer"
-              value={formData.answer}
-              onChange={handleChange}
-              required
-              className="mt-1 p-3 border border-gray-300 rounded-lg focus:ring-purple-500 focus:border-purple-500 transition-all"
-            />
-          </div>
-          <div className="flex gap-4">
-            <motion.button
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-              type="submit"
-              disabled={loading}
-              className={`w-full py-3 px-6 text-white font-bold rounded-full shadow-lg transition-colors disabled:bg-gray-400 ${isEditMode ? 'bg-indigo-600 hover:bg-indigo-700' : 'bg-purple-600 hover:bg-purple-700'}`}
-            >
-              {loading ? 'Processing...' : (isEditMode ? 'Update Question' : 'Add Question')}
-            </motion.button>
-            {isEditMode && (
+              <div className="flex flex-col">
+                <label htmlFor="year" className="text-sm font-medium text-gray-700 dark:text-gray-300">Year</label>
+                <input
+                  type="text"
+                  id="year"
+                  name="year"
+                  value={formData.year}
+                  onChange={handleChange}
+                  required
+                  className="mt-1 p-3 border border-gray-300 dark:border-gray-700 rounded-lg focus:ring-purple-500 focus:border-purple-500 transition-all bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+                />
+              </div>
+              <div className="flex flex-col">
+                <label htmlFor="board" className="text-sm font-medium text-gray-700 dark:text-gray-300">Board</label>
+                <input
+                  type="text"
+                  id="board"
+                  name="board"
+                  value={formData.board}
+                  onChange={handleChange}
+                  required
+                  className="mt-1 p-3 border border-gray-300 dark:border-gray-700 rounded-lg focus:ring-purple-500 focus:border-purple-500 transition-all bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+                />
+              </div>
+            </motion.div>
+            <motion.div variants={itemVariants} className="flex flex-col">
+              <label htmlFor="question" className="text-sm font-medium text-gray-700 dark:text-gray-300">Question</label>
+              <textarea
+                id="question"
+                name="question"
+                value={formData.question}
+                onChange={handleChange}
+                rows="4"
+                required
+                className="mt-1 p-3 border border-gray-300 dark:border-gray-700 rounded-lg focus:ring-purple-500 focus:border-purple-500 transition-all bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+              ></textarea>
+            </motion.div>
+            <motion.div variants={itemVariants} className="flex flex-col">
+              <label htmlFor="image" className="text-sm font-medium text-gray-700 dark:text-gray-300">Image URL (optional)</label>
+              <input
+                type="text"
+                id="image"
+                name="image"
+                value={formData.image}
+                onChange={handleChange}
+                className="mt-1 p-3 border border-gray-300 dark:border-gray-700 rounded-lg focus:ring-purple-500 focus:border-purple-500 transition-all bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+              />
+            </motion.div>
+            <motion.div variants={itemVariants} className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {formData.options.map((option, index) => (
+                <div key={index} className="flex flex-col">
+                  <label className="text-sm font-medium text-gray-700 dark:text-gray-300">Option {String.fromCharCode(65 + index)}</label>
+                  <input
+                    type="text"
+                    value={option}
+                    onChange={(e) => handleOptionChange(index, e)}
+                    required
+                    className="mt-1 p-3 border border-gray-300 dark:border-gray-700 rounded-lg focus:ring-purple-500 focus:border-purple-500 transition-all bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+                  />
+                </div>
+              ))}
+            </motion.div>
+            <motion.div variants={itemVariants} className="flex flex-col">
+              <label htmlFor="answer" className="text-sm font-medium text-gray-700 dark:text-gray-300">Correct Answer</label>
+              <input
+                type="text"
+                id="answer"
+                name="answer"
+                value={formData.answer}
+                onChange={handleChange}
+                required
+                className="mt-1 p-3 border border-gray-300 dark:border-gray-700 rounded-lg focus:ring-purple-500 focus:border-purple-500 transition-all bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+              />
+            </motion.div>
+            <motion.div variants={itemVariants} className="flex gap-4">
               <motion.button
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
-                type="button"
-                onClick={clearForm}
-                className="w-full py-3 px-6 bg-gray-500 text-white font-bold rounded-full shadow-lg hover:bg-gray-600 transition-colors"
+                type="submit"
+                disabled={loading}
+                className={`w-full py-3 px-6 text-white font-bold rounded-full shadow-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${isEditMode ? 'bg-indigo-600 hover:bg-indigo-700' : 'bg-purple-600 hover:bg-purple-700'}`}
               >
-                Cancel Edit
+                {loading ? 'Processing...' : (isEditMode ? 'Update Question' : 'Add Question')}
               </motion.button>
-            )}
-          </div>
-        </form>
-      </motion.div>
-
-      <motion.div
-        initial={{ opacity: 0, scale: 0.9 }}
-        animate={{ opacity: 1, scale: 1 }}
-        transition={{ duration: 0.5 }}
-        className="max-w-4xl w-full mx-auto bg-white rounded-2xl shadow-xl overflow-hidden p-8 mb-8"
-      >
-        <h2 className="text-3xl font-bold text-center text-purple-700 mb-6">Upload (from CSV)</h2>
-        <div className="space-y-4">
-          <p className="text-gray-600 text-center">
-            You can upload multiple questions at once using a CSV file. The CSV file must have the following headers: <br />
-            <code className="bg-gray-200 p-1 rounded-md text-sm font-mono">subject, year, board, question, option1, option2, option3, option4, answer, image</code>
-          </p>
-          <div className="flex flex-col md:flex-row items-center gap-4">
-            <input
-              type="file"
-              accept=".csv"
-              onChange={handleFileChange}
-              className="block w-full text-sm text-gray-500
-              file:mr-4 file:py-2 file:px-4
-              file:rounded-full file:border-0
-              file:text-sm file:font-semibold
-              file:bg-purple-50 file:text-purple-700
-              hover:file:bg-purple-100"
-            />
-            <motion.button
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-              onClick={handleCsvUpload}
-              disabled={loading || !csvFile}
-              className="w-full md:w-auto py-3 px-6 text-white font-bold rounded-full shadow-lg transition-colors disabled:bg-gray-400 bg-green-600 hover:bg-green-700"
-            >
-              {loading ? 'Uploading...' : 'Upload CSV'}
-            </motion.button>
-          </div>
-        </div>
-      </motion.div>
-      
-      {questions.length > 0 && (
-        <motion.div
-          initial={{ opacity: 0, scale: 0.9 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.5 }}
-          className="max-w-4xl w-full mx-auto bg-white rounded-2xl shadow-xl p-8"
-        >
-          <h3 className="text-2xl font-bold text-center text-gray-800 mb-6">Existing Questions ({questions.length})</h3>
-          <div className="space-y-4">
-            {questions.map((question) => (
-              <div key={question._id} className="p-4 border border-gray-200 rounded-lg bg-gray-50 hover:bg-gray-100 transition-colors">
-                <p className="font-bold">{question.question}</p>
-                <p className="text-sm text-gray-600">Subject: {question.subject} | Year: {question.year} | Board: {question.board}</p>
-                <div className="mt-2 space-x-2">
-                  <motion.button
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                    onClick={() => handleEdit(question)}
-                    className="py-1 px-4 bg-indigo-500 text-white rounded-full text-sm hover:bg-indigo-600"
-                  >
-                    Edit
-                  </motion.button>
-                  <motion.button
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                    onClick={() => handleDeleteClick(question._id)}
-                    className="py-1 px-4 bg-red-500 text-white rounded-full text-sm hover:bg-red-600"
-                  >
-                    Delete
-                  </motion.button>
-                </div>
-              </div>
-            ))}
-          </div>
+              {isEditMode && (
+                <motion.button
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  type="button"
+                  onClick={clearForm}
+                  className="w-full py-3 px-6 bg-gray-500 text-white font-bold rounded-full shadow-lg hover:bg-gray-600 transition-colors"
+                >
+                  Cancel Edit
+                </motion.button>
+              )}
+            </motion.div>
+          </motion.form>
         </motion.div>
-      )}
+
+        <motion.div
+          variants={containerVariants}
+          className="w-full bg-white/50 dark:bg-gray-800/50 backdrop-blur-md rounded-2xl shadow-2xl overflow-hidden p-8 mb-8 border border-white/20 dark:border-gray-700/50"
+        >
+          <motion.h2 variants={itemVariants} className="text-3xl font-bold text-center text-purple-700 dark:text-purple-400 mb-6">
+            Bulk Upload (from CSV)
+          </motion.h2>
+          <motion.div variants={itemVariants} className="space-y-4">
+            <p className="text-gray-600 dark:text-gray-400 text-center">
+              You can upload multiple questions at once using a CSV file. The CSV file must have the following headers: <br />
+              <code className="bg-gray-200 dark:bg-gray-700 p-1 rounded-md text-sm font-mono text-gray-800 dark:text-gray-200">subject, year, board, question, option1, option2, option3, option4, answer, image</code>
+            </p>
+            <div className="flex flex-col md:flex-row items-center gap-4">
+              <input
+                type="file"
+                accept=".csv"
+                onChange={handleFileChange}
+                className="block w-full text-sm text-gray-500 dark:text-gray-400
+                  file:mr-4 file:py-2 file:px-4
+                  file:rounded-full file:border-0
+                  file:text-sm file:font-semibold
+                  file:bg-purple-50 file:text-purple-700
+                  hover:file:bg-purple-100"
+              />
+              <motion.button
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                onClick={handleCsvUpload}
+                disabled={loading || !csvFile}
+                className="w-full md:w-auto py-3 px-6 text-white font-bold rounded-full shadow-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed bg-green-600 hover:bg-green-700"
+              >
+                {loading ? 'Uploading...' : 'Upload CSV'}
+              </motion.button>
+            </div>
+          </motion.div>
+        </motion.div>
+
+        {questions.length > 0 && (
+          <motion.div
+            variants={listVariants}
+            initial="hidden"
+            animate="visible"
+            className="w-full bg-white/50 dark:bg-gray-800/50 backdrop-blur-md rounded-2xl shadow-2xl p-8 border border-white/20 dark:border-gray-700/50"
+          >
+            <h3 className="text-2xl font-bold text-center text-gray-800 dark:text-gray-200 mb-6">Existing Questions ({questions.length})</h3>
+            <div className="space-y-4">
+              <AnimatePresence>
+                {questions.map((question) => (
+                  <motion.div
+                    key={question._id}
+                    variants={cardItemVariants}
+                    initial="hidden"
+                    animate="visible"
+                    exit="hidden"
+                    layout
+                    className="p-4 border border-gray-200 dark:border-gray-700 rounded-lg bg-gray-50/50 dark:bg-gray-700/50 hover:bg-gray-100/50 dark:hover:bg-gray-700/80 transition-colors"
+                  >
+                    <p className="font-bold text-gray-800 dark:text-gray-200">{question.question}</p>
+                    <p className="text-sm text-gray-600 dark:text-gray-400">Subject: {question.subject} | Year: {question.year} | Board: {question.board}</p>
+                    <div className="mt-2 space-x-2">
+                      <motion.button
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
+                        onClick={() => handleEdit(question)}
+                        className="py-1 px-4 bg-indigo-500 text-white rounded-full text-sm hover:bg-indigo-600"
+                      >
+                        Edit
+                      </motion.button>
+                      <motion.button
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
+                        onClick={() => handleDeleteClick(question._id)}
+                        className="py-1 px-4 bg-red-500 text-white rounded-full text-sm hover:bg-red-600"
+                      >
+                        Delete
+                      </motion.button>
+                    </div>
+                  </motion.div>
+                ))}
+              </AnimatePresence>
+            </div>
+          </motion.div>
+        )}
+      </motion.div>
 
       <AnimatePresence>
         {showConfirmModal && (
@@ -540,14 +619,14 @@ const AdminPanel = () => {
               initial={{ scale: 0.8, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.8, opacity: 0 }}
-              className="bg-white p-6 rounded-xl shadow-2xl w-full max-w-sm"
+              className="bg-white dark:bg-gray-900 p-6 rounded-xl shadow-2xl w-full max-w-sm"
             >
-              <h3 className="text-lg font-bold text-gray-900 mb-4">Confirm Deletion</h3>
-              <p className="text-gray-600 mb-6">Are you sure you want to delete this question? This action cannot be undone.</p>
+              <h3 className="text-lg font-bold text-gray-900 dark:text-gray-100 mb-4">Confirm Deletion</h3>
+              <p className="text-gray-600 dark:text-gray-400 mb-6">Are you sure you want to delete this question? This action cannot be undone.</p>
               <div className="flex justify-end space-x-4">
                 <button
                   onClick={() => setShowConfirmModal(false)}
-                  className="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg font-semibold hover:bg-gray-300 transition-colors"
+                  className="px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded-lg font-semibold hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors"
                 >
                   Cancel
                 </button>
@@ -575,16 +654,16 @@ const AdminPanel = () => {
               initial={{ scale: 0.8, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.8, opacity: 0 }}
-              className={`bg-white p-6 rounded-xl shadow-2xl w-full max-w-sm ${isSuccess ? 'border-green-500 border-t-4' : 'border-red-500 border-t-4'}`}
+              className={`bg-white dark:bg-gray-900 p-6 rounded-xl shadow-2xl w-full max-w-sm ${isSuccess ? 'border-green-500 border-t-4' : 'border-red-500 border-t-4'}`}
             >
               <h3 className={`text-lg font-bold mb-2 ${isSuccess ? 'text-green-700' : 'text-red-700'}`}>
                 {isSuccess ? 'Success!' : 'Error!'}
               </h3>
-              <p className="text-gray-600 mb-6">{message}</p>
+              <p className="text-gray-600 dark:text-gray-400 mb-6">{message}</p>
               <div className="flex justify-end">
                 <button
                   onClick={closeMessageModal}
-                  className="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg font-semibold hover:bg-gray-300 transition-colors"
+                  className="px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded-lg font-semibold hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors"
                 >
                   OK
                 </button>

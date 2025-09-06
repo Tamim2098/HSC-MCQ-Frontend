@@ -168,15 +168,17 @@ const MainContent = ({ currentQuestion, currentQuestionIndex, totalQuestions, an
             </div>
             <div className="space-y-4 md:space-y-6">
               {currentQuestion?.options?.map((option, i) => (
-                <label key={i} htmlFor={`option-${currentQuestionIndex}-${i}`} className={`relative flex items-start gap-4 p-4 lg:p-5 rounded-xl cursor-pointer transition-all duration-200 group border-2
+                <label key={i} htmlFor={`option-${currentQuestionIndex}-${i}`} className={`relative flex items-center gap-4 p-4 lg:p-5 rounded-xl cursor-pointer transition-all duration-200 group border-2
                   ${answers?.[currentQuestionIndex] === option ? 'bg-purple-700 text-white border-purple-700 shadow-lg' : 'bg-gray-800 hover:bg-gray-700 text-gray-200 border-gray-700 hover:border-gray-600 shadow-sm hover:shadow-md'}`}>
                   <input type="radio" id={`option-${currentQuestionIndex}-${i}`} name={`question-${currentQuestionIndex}`} className="hidden" value={option} checked={answers?.[currentQuestionIndex] === option} onChange={() => handleAnswerChange(option)} disabled={!!answers?.[currentQuestionIndex]} />
-                  <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm flex-shrink-0 mt-0.5
+                  <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm flex-shrink-0
                     ${answers?.[currentQuestionIndex] === option ? 'bg-gray-900 text-purple-400' : 'bg-gray-700 text-purple-400 group-hover:bg-gray-600'}`}>
                     {String.fromCharCode(65 + i)}
                   </div>
-                  <span className="flex-1 font-medium text-base lg:text-lg leading-relaxed bangla-font">{renderTextWithMath(option)}</span>
-                  {answers?.[currentQuestionIndex] === option && <CheckCircle className="w-6 h-6 flex-shrink-0 mt-0.5" />}
+                  <div className="flex-1 font-medium text-base lg:text-lg leading-relaxed bangla-font text-left">
+                    {renderTextWithMath(option)}
+                  </div>
+                  {answers?.[currentQuestionIndex] === option && <CheckCircle className="w-6 h-6 flex-shrink-0" />}
                 </label>
               ))}
             </div>

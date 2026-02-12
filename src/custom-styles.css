@@ -1,0 +1,235 @@
+@import url('https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@300;400;500;600;700&display=swap');
+
+/* Base styles for Bangla font */
+.bangla-font {
+  font-family: 'Hind Siliguri', 'Noto Sans Bengali', 'Roboto', Arial, sans-serif;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  hyphens: auto;
+  line-height: 1.6;
+}
+
+/* KaTeX text font styles */
+.katex .text-font {
+  font-family: 'Hind Siliguri', 'Noto Sans Bengali', 'Roboto', Arial, sans-serif !important;
+  white-space: normal !important;
+  word-wrap: break-word !important;
+  overflow-wrap: break-word !important;
+}
+
+/* Base KaTeX display styles */
+.katex-display {
+  font-size: clamp(1rem, 2.5vw, 1.4rem);
+  width: 100%;
+  overflow-x: visible;
+  overflow-y: visible;
+  overflow: visible;
+  margin: 1em 0;
+  text-align: center;
+  line-height: 1.5;
+  white-space: normal;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+}
+
+/* Base KaTeX inline styles */
+.katex {
+  font-size: clamp(0.9rem, 2vw, 1.2rem);
+  white-space: normal;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  line-height: 1.4;
+}
+
+/* Extra Large Devices (Large Desktops, 1400px and up) */
+@media (min-width: 1400px) {
+  .bangla-font {
+    font-size: 1.1rem;
+    line-height: 1.7;
+  }
+  
+  .katex-display {
+    font-size: 1.5rem;
+    margin: 1.2em 0;
+  }
+  
+  .katex {
+    font-size: 1.3rem;
+  }
+}
+
+/* Large Devices (Desktops, 1200px and up) */
+@media (min-width: 1200px) and (max-width: 1399.98px) {
+  .bangla-font {
+    font-size: 1rem;
+    line-height: 1.65;
+  }
+  
+  .katex-display {
+    font-size: 1.4rem;
+  }
+  
+  .katex {
+    font-size: 1.2rem;
+  }
+}
+
+/* Medium Devices (Tablets, 992px and up) */
+@media (min-width: 992px) and (max-width: 1199.98px) {
+  .bangla-font {
+    font-size: 0.95rem;
+    line-height: 1.6;
+  }
+  
+  .katex-display {
+    font-size: 1.3rem;
+  }
+  
+  .katex {
+    font-size: 1.15rem;
+  }
+}
+
+/* Small Devices (Large Phones/Small Tablets, 768px and up) */
+@media (min-width: 768px) and (max-width: 991.98px) {
+  .bangla-font {
+    font-size: 0.9rem;
+    line-height: 1.55;
+  }
+  
+  .katex-display {
+    font-size: 1.2rem;
+    margin: 0.8em 0;
+  }
+  
+  .katex {
+    font-size: 1.1rem;
+  }
+}
+
+/* Extra Small Devices (Phones, 576px and up) */
+@media (min-width: 576px) and (max-width: 767.98px) {
+  .bangla-font {
+    font-size: 0.85rem;
+    line-height: 1.5;
+  }
+  
+  .katex-display {
+    font-size: 1.1rem;
+    margin: 0.7em 0;
+    padding: 0 0.5rem;
+  }
+  
+  .katex {
+    font-size: 1rem;
+  }
+}
+
+/* Very Small Devices (Small Phones, below 576px) */
+@media (max-width: 575.98px) {
+  .bangla-font {
+    font-size: 0.8rem;
+    line-height: 1.45;
+  }
+  
+  .katex-display {
+    font-size: 1rem;
+    margin: 0.6em 0;
+    padding: 0 0.25rem;
+    overflow: visible;
+    white-space: normal;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+  }
+  
+  .katex {
+    font-size: 0.9rem;
+  }
+}
+
+/* Ultra Small Devices (Very Small Phones, below 400px) */
+@media (max-width: 399.98px) {
+  .bangla-font {
+    font-size: 0.75rem;
+    line-height: 1.4;
+  }
+  
+  .katex-display {
+    font-size: 0.9rem;
+    margin: 0.5em 0;
+  }
+  
+  .katex {
+    font-size: 0.85rem;
+  }
+}
+
+/* Landscape orientation adjustments for mobile devices */
+@media (max-width: 991.98px) and (orientation: landscape) {
+  .katex-display {
+    font-size: 0.95em;
+    margin: 0.5em 0;
+  }
+  
+  .katex {
+    font-size: 0.9em;
+  }
+}
+
+/* High DPI/Retina display optimizations */
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+  .bangla-font,
+  .katex,
+  .katex-display {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+}
+
+/* Print styles */
+@media print {
+  .bangla-font {
+    font-size: 12pt;
+    line-height: 1.4;
+  }
+  
+  .katex-display {
+    font-size: 14pt;
+    page-break-inside: avoid;
+  }
+  
+  .katex {
+    font-size: 12pt;
+  }
+}
+
+/* Accessibility: Respect user's motion preferences */
+@media (prefers-reduced-motion: reduce) {
+  .katex-display,
+  .katex {
+    transition: none;
+  }
+}
+
+/* Additional responsive text wrapping utilities */
+.katex-display * {
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+/* Force wrap for long mathematical expressions */
+.katex-display .katex-html {
+  white-space: normal !important;
+  word-wrap: break-word !important;
+  overflow-wrap: break-word !important;
+  display: inline-block;
+  max-width: 100%;
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+  .katex-display,
+  .katex {
+    color: #e0e0e0;
+  }
+}

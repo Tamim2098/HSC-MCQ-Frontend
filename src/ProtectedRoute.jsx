@@ -6,7 +6,7 @@ const ProtectedRoute = ({ children }) => {
   const [isLoading, setIsLoading] = useState(true);
 
   // ব্যাকএন্ড URL - এটি আপনার প্রোডাকশন সার্ভারের সাথে আপডেট করে নিবেন
-  const backendUrl = import.meta.env.VITE_BACKEND_URL || 'http://localhost:5000';
+  const backendUrl = import.meta.env.VITE_BACKEND_URL || 'https://hsc-mcq-backend.onrender.com';
 
   useEffect(() => {
     const verifyToken = async () => {

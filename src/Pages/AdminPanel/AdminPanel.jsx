@@ -82,7 +82,7 @@ const AdminPanel = () => {
   const navigate = useNavigate();
 
   // Ensure this matches your production/local backend URL
-  const backendUrl = 'http://localhost:5000';
+  const backendUrl = 'https://hsc-mcq-backend.onrender.com';
 
   useEffect(() => {
     const token = localStorage.getItem('adminToken');

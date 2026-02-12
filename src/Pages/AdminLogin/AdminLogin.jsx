@@ -27,7 +27,7 @@ const AdminLogin = () => {
   const [error, setError] = useState(null);
   const navigate = useNavigate();
 
-  const backendUrl = 'http://localhost:5000';
+  const backendUrl = 'https://hsc-mcq-backend.onrender.com';
 
   const handleSubmit = async (e) => {
     e.preventDefault();
